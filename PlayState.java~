@@ -1,0 +1,49 @@
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.awt.Color;
+
+public class PlayState extends GameState {
+
+	private Paddle redPaddle, bluePaddle, redPaddle2;
+	private int tempX = 1;
+
+	public PlayState(GameStateManager gsm){
+		init();
+	}
+
+	public void init(){
+		//paddle constructor asks if red.
+		redPaddle = new Paddle(true);
+		bluePaddle = new Paddle(false);
+		bluePaddle.setAngle(90);
+		redPaddle2 = new Paddle(true);
+		redPaddle2.setAngle(270);
+	}
+
+	public void update(){
+		redPaddle.setAngle(tempX);
+		handleInput();
+	}
+	
+	public void draw(Graphics g){
+		g.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
+		redPaddle.draw(g);
+		redPaddle2.draw(g);
+		bluePaddle.draw(g);
+	}
+
+	public void handleInput(){
+		if(Keys.isPressed(Keys.RIGHT)){
+			tempX += 2;
+		}
+		if(Keys.isPressed(Keys.LEFT)){
+			tempX -= 2;
+		}
+		if(Keys.isPressed(Keys.UP)){
+			redPaddle.moveUp();
+		}
+		if(Keys.isPressed(Keys.DOWN)){
+			redPaddle.moveDown();
+		}
+	}
+}

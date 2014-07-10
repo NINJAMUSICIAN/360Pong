@@ -1,0 +1,102 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.imageio.ImageIO;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+
+public class Paddle extends Entity{
+	
+	private boolean innerCircle;
+	private double currentAngle;
+	private ArrayList<BufferedImage[]> sprites;
+	private AffineTransform transform; 
+
+	public Paddle(boolean isRed){
+		width = 60;
+		height = 15;
+		cwidth = 60;
+		cheight = 15;		
+		moveSpeed = 0.5;
+		maxSpeed = 0.5;
+		stopSpeed = 0.4;
+		facingRight = true;
+		try{
+			BufferedImage spritesheet;
+			if(isRed){
+			innerCircle = true;
+			spritesheet = ImageIO.read(
+				getClass().getResourceAsStream("/Resources/RedPaddle.png"));
+			}else{
+			innerCircle = false;
+			spritesheet = ImageIO.read(
+				getClass().getResourceAsStream("/Resources/BluePaddle.png"));
+			}
+				BufferedImage[] bi = new BufferedImage[1];
+				bi[0] = spritesheet.getSubimage(
+							0,
+							0,
+							width,
+							height
+						);
+			sprites = new ArrayList<BufferedImage[]>();
+			sprites.add(bi);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
+		animation.setFrames(sprites.get(0));
+		animation.setDelay(400);
+	}
+
+	public void setAngle(double angle){
+		//circleX and circleY are for where the center of the circle is / 100.
+		int circleX = 4;
+		int circleY = 4;
+
+		int radius = 3;
+
+		if(innerCircle){
+			radius = 2;
+		}else{
+			radius = 3;
+		}	
+		
+		double newX = (Math.cos(Math.toRadians(angle)) * radius + circleX);
+		double newY = (Math.sin(Math.toRadians(angle)) * radius + circleY);
+		//System.out.println("new Position is: " + newX + " " + newY);
+
+		x = newX * 100;
+		y = newY * 100;
+		currentAngle = angle;
+	}
+
+	public void rotate(Graphics g, double angle){
+		AffineTransform tx = 
+			AffineTransform.getRotateInstance((Math.toRadians(angle)), x, y);
+	       AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+
+	       Graphics2D g2D = (Graphics2D) g;
+	       g2D.drawImage(sprites.get(0), tx, x, y, null);
+	}	
+
+	//changing circle stuff here
+	public void moveUp(){
+		if(!innerCircle){
+			innerCircle = true;
+		}
+	}
+	public void moveDown(){
+		if(innerCircle){
+			innerCircle = false;
+		}
+	}
+	
+
+	public void draw(Graphics g){
+		super.draw(g);	
+		rotate(g, currentAngle);
+	}
+}
